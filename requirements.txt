@@ -1,0 +1,7 @@
+numpy==1.23.4
+opencv-contrib-python==4.6.0.66
+opencv-python==4.6.0.66
+Pillow==9.2.0
+pygame==2.1.2
+PyOpenGL @ file:///C:/Users/elmanara/Desktop/PyOpenGL-3.1.6-cp39-cp39-win_amd64.whl
+PyOpenGL-accelerate @ file:///C:/Users/elmanara/Desktop/PyOpenGL_accelerate-3.1.6-cp39-cp39-win_amd64.whl

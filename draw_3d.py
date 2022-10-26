@@ -48,16 +48,15 @@ class draw3d:
         
         glEnd()
         glBindTexture(GL_TEXTURE_2D,0)
-    
-    def draw_background(self,frame):
-        im=cv2.flip(frame,0)
-        im=cv2.cvtColor(im,cv2.COLOR_BGR2RGB)
-        im=im.astype(np.float32)
-        glBindTexture(GL_TEXTURE_2D, self.back)
         
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, im.shape[0], im.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, im)
+    def draw_background2(self,frame):
+
         
 
+        glBindTexture(GL_TEXTURE_2D, self.back)
+
+        #glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, im.shape[0], im.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, im)
+        
         x=self.x
         z=self.z
         glBegin(GL_QUADS)
@@ -67,6 +66,33 @@ class draw3d:
         glTexCoord2f(0,0); glVertex3fv((-x, -x, -z))
         glEnd()
 
+        
+        glBindTexture(GL_TEXTURE_2D, 0)
+        
+    def draw_background(self,frame):
+
+        
+  
+        im=cv2.flip(frame,0)
+        im=cv2.cvtColor(im,cv2.COLOR_BGR2RGB)
+        
+    
+        im=im.astype(np.float32)
+
+        glBindTexture(GL_TEXTURE_2D, self.back)
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, im.shape[0], im.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, im)
+        
+        x=self.x
+        z=self.z
+        glBegin(GL_QUADS)
+        glTexCoord2f(0,1); glVertex3fv((-x, x, -z))
+        glTexCoord2f(1,1); glVertex3fv((x, x, -z))
+        glTexCoord2f(1,0); glVertex3fv((x, -x, -z))
+        glTexCoord2f(0,0); glVertex3fv((-x, -x, -z))
+        glEnd()
+
+        
         glBindTexture(GL_TEXTURE_2D, 0)
         
     def draw(self,frame,mat):
@@ -75,7 +101,7 @@ class draw3d:
         
         glLoadMatrixd(mat)
         
-        self.draw_cube()
+        self.draw_obj()
         glLoadIdentity()
          
         glFlush()
@@ -102,6 +128,8 @@ class draw3d:
         
         self.z=float(100)
         self.x=(np.tan( (float(fov)/2.0) *(np.pi/180)) )*self.z
+        
+        
         self.back = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, self.back)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
@@ -110,20 +138,19 @@ class draw3d:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         
         
+        
         self.obj = glGenTextures(1)
         obj_image = cv2.imread(r'data\cube.jpg');
         obj_image=cv2.flip(obj_image,0)
         obj_image=cv2.cvtColor(obj_image,cv2.COLOR_BGR2RGB)
         obj_image=obj_image.astype(np.float32)
-    
-    
         glBindTexture(GL_TEXTURE_2D, self.obj)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, obj_image.shape[0], obj_image.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, obj_image)
+    
     
         self.ind,self.ver=ObjLoader.load_model(r'data\cube.obj')
         
@@ -156,7 +183,7 @@ class draw3d:
         pygame.time.wait(10)
         
         
-opencvc=computer_vision(r'data\video2.mp4',900,512)
+opencvc=computer_vision('data\\video3.mp4',900,512)
 opengl=draw3d(900,512)
 
 while True:
@@ -168,8 +195,9 @@ while True:
         
         opengl.main(data[0],None,False)
     else :
+
+        opengl.main(data[0],data[1],True)
         
-        opengl.main(data[0],data[1])
     
     
     

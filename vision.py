@@ -94,6 +94,7 @@ class computer_vision:
             
             fr=data[0]
 
+
             tl,tr,br,bl =data[2],data[3],data[4],data[5],
             pts = np.array([tl, tr, 
                 br, bl],
@@ -108,4 +109,7 @@ class computer_vision:
         self.video.release()
         cv2.destroyAllWindows()
         
+if __name__ =="__main__":
         
+    obj=computer_vision(r'data\video2.mp4',900,512)
+    obj.main()
