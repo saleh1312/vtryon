@@ -49,25 +49,7 @@ class draw3d:
         glEnd()
         glBindTexture(GL_TEXTURE_2D,0)
         
-    def draw_background2(self,frame):
-
-        
-
-        glBindTexture(GL_TEXTURE_2D, self.back)
-
-        #glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, im.shape[0], im.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, im)
-        
-        x=self.x
-        z=self.z
-        glBegin(GL_QUADS)
-        glTexCoord2f(0,1); glVertex3fv((-x, x, -z))
-        glTexCoord2f(1,1); glVertex3fv((x, x, -z))
-        glTexCoord2f(1,0); glVertex3fv((x, -x, -z))
-        glTexCoord2f(0,0); glVertex3fv((-x, -x, -z))
-        glEnd()
-
-        
-        glBindTexture(GL_TEXTURE_2D, 0)
+    
         
     def draw_background(self,frame):
 
@@ -83,8 +65,11 @@ class draw3d:
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, im.shape[0], im.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, im)
         
+        
         x=self.x
         z=self.z
+        print(x)
+        print(z)
         glBegin(GL_QUADS)
         glTexCoord2f(0,1); glVertex3fv((-x, x, -z))
         glTexCoord2f(1,1); glVertex3fv((x, x, -z))
@@ -101,7 +86,7 @@ class draw3d:
         
         glLoadMatrixd(mat)
         
-        self.draw_obj()
+        self.draw_cube()
         glLoadIdentity()
          
         glFlush()
@@ -123,11 +108,12 @@ class draw3d:
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         fov=2*(np.arctan(0.5*size/focal_lengh)*180/np.pi)
-        gluPerspective(fov, 1, 0.1, 100.0)
+        gluPerspective(fov, 1, 0.1, 101.0)
         
         
         self.z=float(100)
         self.x=(np.tan( (float(fov)/2.0) *(np.pi/180)) )*self.z
+        
         
         
         self.back = glGenTextures(1)
@@ -140,7 +126,7 @@ class draw3d:
         
         
         self.obj = glGenTextures(1)
-        obj_image = cv2.imread(r'data\cube.jpg');
+        obj_image = cv2.imread(r'data\monkey.jpg');
         obj_image=cv2.flip(obj_image,0)
         obj_image=cv2.cvtColor(obj_image,cv2.COLOR_BGR2RGB)
         obj_image=obj_image.astype(np.float32)
@@ -152,7 +138,7 @@ class draw3d:
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, obj_image.shape[0], obj_image.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, obj_image)
     
     
-        self.ind,self.ver=ObjLoader.load_model(r'data\cube.obj')
+        self.ind,self.ver=ObjLoader.load_model(r'data\monkey.obj')
         
         
         glMatrixMode(GL_MODELVIEW)
