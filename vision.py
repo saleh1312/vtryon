@@ -31,7 +31,23 @@ class computer_vision:
                                         self.arucoDict
                                         ,parameters=self.arucoparam)
         
-        return box,ids
+        box=np.array(box)
+        
+        
+        if len(box.shape) !=4:
+            return None
+        
+        tl=(box[0,0,0,0],box[0,0,0,1])
+        tr=(box[0,0,1,0],box[0,0,1,1])
+        br=(box[0,0,2,0],box[0,0,2,1])
+        bl=(box[0,0,3,0],box[0,0,3,1])
+        
+        
+        image_points = np.array([
+            tl,tr,br,bl,    
+            ], dtype="double")
+        
+        return image_points
     
     def convert_to_opengl( self,rvecs,tvecs):
 
@@ -55,15 +71,12 @@ class computer_vision:
  
         return view_matrix
 
-    def detect_matrix(self,tl,tr,br,bl):
-        image_points = np.array([
-            tl,tr,br,bl,    
-            ], dtype="double")
-        
-        
+    def detect_matrix(self,image_points):
+    
         (success, rotation_vector, translation_vector) = cv2.solvePnP(self.model_points, image_points, self.camera_matrix, self.dist_coeffs)
 
         return self.convert_to_opengl(rotation_vector, translation_vector)
+    
     def read(self):
         if self.video.isOpened():
             ret, frame = self.video.read()
@@ -72,17 +85,12 @@ class computer_vision:
                 return [None]
             
             frame=cv2.resize(frame,(self.size,self.size))
-            box,ids=self.detect_aruco(frame)
-            box=np.array(box)
-            if len(box.shape) !=4:
-                return [frame ,None]
+            image_points=self.detect_aruco(frame)
             
-            tl=(box[0,0,0,0],box[0,0,0,1])
-            tr=(box[0,0,1,0],box[0,0,1,1])
-            br=(box[0,0,2,0],box[0,0,2,1])
-            bl=(box[0,0,3,0],box[0,0,3,1])
+            if type(image_points)==type(None):
+                return [frame,None]
             
-            return [frame ,self.detect_matrix(tl,tr,br,bl),tl,tr,br,bl]
+            return [frame ,self.detect_matrix(image_points),image_points]
         else:
             return [None]
         
@@ -95,12 +103,7 @@ class computer_vision:
             fr=data[0]
 
 
-            tl,tr,br,bl =data[2],data[3],data[4],data[5],
-            pts = np.array([tl, tr, 
-                br, bl],
-               np.int32)
-    
-            pts = pts.reshape((-1, 1, 2))
+            pts = data[2].reshape((-1, 1, 2)).astype(np.int32)
             cv2.polylines(fr,[pts],True,(255,0,0),3)
             cv2.imshow('frame',fr)
             if cv2.waitKey(5) & 0xFF == ord('q'):

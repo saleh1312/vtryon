@@ -125,7 +125,7 @@ class draw3d:
         
         
         self.obj = glGenTextures(1)
-        obj_image = cv2.imread(r'data\cube.jpg');
+        obj_image = cv2.imread(r'data\gta.png');
         obj_image=cv2.flip(obj_image,0)
         obj_image=cv2.cvtColor(obj_image,cv2.COLOR_BGR2RGB)
         obj_image=obj_image.astype(np.float32)
@@ -137,7 +137,9 @@ class draw3d:
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, obj_image.shape[0], obj_image.shape[1], 0, GL_RGB, GL_UNSIGNED_BYTE, obj_image)
     
     
-        self.ind,self.ver=ObjLoader.load_model(r'data\cube.obj')
+        self.ind,self.ver=ObjLoader.load_model(r'data\gta.obj')
+        print(self.ind)
+        print(self.ver)
         
         
         glMatrixMode(GL_MODELVIEW)
