@@ -13,6 +13,26 @@ class poseDetector:
         self.mp_pose=mp.solutions.pose
         self.pose=self.mp_pose.Pose(min_detection_confidence=0.5,static_image_mode=True, min_tracking_confidence=0.5)
     
+    
+        self.model_points=np.array([
+                                (0.21, 0.58, -0.06),
+                                (-0.21, 0.58, -0.06), 
+                                
+                                (0.14,0.11,0.08),   
+                                (-0.14,0.11,0.08), 
+                                
+                                (0.56,0.56,0.01),   
+                                (-0.56,0.56,0.01),  
+                                
+                                (0.76,0.54,0),   
+                                (-0.76,0.54,0),   
+                                
+                                (0.10,-0.46,0.01),   
+                                (-0.10,-0.46,0.01),  
+                            ])
+    
+    
+    
     def detect(self,img):
         shape =img.shape
         
@@ -34,9 +54,14 @@ class poseDetector:
             lknee = [int(landmarks[self.mp_pose.PoseLandmark.LEFT_KNEE.value].x*shape[1]),int(landmarks[self.mp_pose.PoseLandmark.LEFT_KNEE.value].y*shape[0])]
             rknee = [int(landmarks[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].x*shape[1]),int(landmarks[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].y*shape[0])]
 
-            print(lshoulder)
+            image_points = np.array([
+                tl,tr,br,bl,    
+                ], dtype="double")
+            
+            return image_points
+        
         except:
-            pass
+            return None
 
         # Recolor back to BGR
         rgbimage.flags.writeable = True
