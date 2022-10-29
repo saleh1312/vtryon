@@ -1,22 +1,16 @@
 import cv2
 import cv2.aruco as aruco
 import numpy as np
-
+from detectors import arucoDetector
 
 class computer_vision:
     def __init__(self,video_name,focal_length,size):
         self.size=size
         self.video=cv2.VideoCapture(video_name)
-        self.arucoDict=aruco.Dictionary_get(aruco.DICT_6X6_250)
-        self.arucoparam=aruco.DetectorParameters_create()
         
-        self.model_points=np.array([
-                                (-1.0, 1.0, -1.0),             
-                                (1.0, 1.0, -1.0),       
-                                (1.0,-1.0,-1.0),   
-                                (-1.0,-1.0,-1.0),     
-                            ])
-    
+        self.detector=arucoDetector()
+        
+       
         center = (size/2, size/2)
         self.camera_matrix = np.array(
                             [[focal_length, 0, center[0]],
@@ -25,29 +19,7 @@ class computer_vision:
                             )
         self.dist_coeffs = np.zeros((4,1)) # Assuming no lens distortion
         
-    def detect_aruco(self,img):
-        gray =cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        box,ids,rej=aruco.detectMarkers(gray,
-                                        self.arucoDict
-                                        ,parameters=self.arucoparam)
-        
-        box=np.array(box)
-        
-        
-        if len(box.shape) !=4:
-            return None
-        
-        tl=(box[0,0,0,0],box[0,0,0,1])
-        tr=(box[0,0,1,0],box[0,0,1,1])
-        br=(box[0,0,2,0],box[0,0,2,1])
-        bl=(box[0,0,3,0],box[0,0,3,1])
-        
-        
-        image_points = np.array([
-            tl,tr,br,bl,    
-            ], dtype="double")
-        
-        return image_points
+    
     
     def convert_to_opengl( self,rvecs,tvecs):
 
@@ -73,7 +45,7 @@ class computer_vision:
 
     def detect_matrix(self,image_points):
     
-        (success, rotation_vector, translation_vector) = cv2.solvePnP(self.model_points, image_points, self.camera_matrix, self.dist_coeffs)
+        (success, rotation_vector, translation_vector) = cv2.solvePnP(self.detector.model_points, image_points, self.camera_matrix, self.dist_coeffs)
 
         return self.convert_to_opengl(rotation_vector, translation_vector)
     
@@ -85,7 +57,7 @@ class computer_vision:
                 return [None]
             
             frame=cv2.resize(frame,(self.size,self.size))
-            image_points=self.detect_aruco(frame)
+            image_points=self.detector.detect(frame)
             
             if type(image_points)==type(None):
                 return [frame,None]
@@ -103,8 +75,7 @@ class computer_vision:
             fr=data[0]
 
 
-            pts = data[2].reshape((-1, 1, 2)).astype(np.int32)
-            cv2.polylines(fr,[pts],True,(255,0,0),3)
+            self.detector.draw_result(fr, data[2])
             cv2.imshow('frame',fr)
             if cv2.waitKey(5) & 0xFF == ord('q'):
                 break
