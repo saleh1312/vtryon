@@ -1,14 +1,14 @@
 import cv2
 import cv2.aruco as aruco
 import numpy as np
-from detectors import arucoDetector
+from detectors import arucoDetector,poseDetector
 
 class computer_vision:
     def __init__(self,video_name,focal_length,size):
         self.size=size
         self.video=cv2.VideoCapture(video_name)
         
-        self.detector=arucoDetector()
+        self.detector=poseDetector()
         
        
         center = (size/2, size/2)
@@ -69,9 +69,14 @@ class computer_vision:
     def main(self):
         while(True):
             data=self.read()
-            if type(data[0])==type(None):
+            if type(data[0])==type(None): # if video ends
                 break
-            
+            elif type(data[1])==type(None):  # if video not ends but no points detected
+                cv2.imshow('frame',data[0])
+                if cv2.waitKey(5) & 0xFF == ord('q'):
+                    break
+                continue
+
             fr=data[0]
 
 
@@ -85,5 +90,5 @@ class computer_vision:
         
 if __name__ =="__main__":
         
-    obj=computer_vision(r'data\video2.mp4',900,512)
+    obj=computer_vision(r'data\mediapipetest\vid.wmv',900,512)
     obj.main()

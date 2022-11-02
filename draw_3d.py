@@ -56,6 +56,7 @@ class draw3d:
         
   
         im=cv2.flip(frame,0)
+  
         im=cv2.cvtColor(im,cv2.COLOR_BGR2RGB)
         
     
@@ -170,11 +171,12 @@ class draw3d:
         pygame.time.wait(10)
         
         
-opencvc=computer_vision('data\\video3.mp4',900,512)
+opencvc=computer_vision('data\\test123.mp4',900,512)
 opengl=draw3d(900,512)
 
 while True:
     data=opencvc.read()
+    
     if type(data[0])==type(None):
         opengl.video.release()
         break
@@ -182,7 +184,7 @@ while True:
         
         opengl.main(data[0],None,False)
     else :
-
+      
         opengl.main(data[0],data[1],True)
         
     

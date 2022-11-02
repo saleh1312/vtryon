@@ -11,24 +11,25 @@ class poseDetector:
     def __init__(self):
         self.mp_drawing=mp.solutions.drawing_utils
         self.mp_pose=mp.solutions.pose
-        self.pose=self.mp_pose.Pose(min_detection_confidence=0.5,static_image_mode=True, min_tracking_confidence=0.5)
+        self.pose=self.mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
     
     
         self.model_points=np.array([
-                                (0.21, 0.58, -0.06),
-                                (-0.21, 0.58, -0.06), 
+                                (0.21, 0.58, 0),
+                                (-0.21, 0.58, 0), 
                                 
-                                (0.14,0.11,0.08),   
-                                (-0.14,0.11,0.08), 
+                                #(0.14,0.11,0.08),   
+                                #(-0.14,0.11,0.08), 
                                 
-                                (0.56,0.56,0.01),   
-                                (-0.56,0.56,0.01),  
+                                (0.56,0.56,0),   
+                                (-0.56,0.56,0),  
                                 
-                                (0.76,0.54,0),   
-                                (-0.76,0.54,0),   
                                 
-                                (0.10,-0.46,0.01),   
-                                (-0.10,-0.46,0.01),  
+                                #(0.76,0.54,0),   
+                                #(-0.76,0.54,0),   
+                                
+                                #(0.10,-0.46,0.01),   
+                                #(-0.10,-0.46,0.01),  
                             ])
     
     
@@ -43,6 +44,7 @@ class poseDetector:
         # Extract landmarks
         try:
             landmarks = results.pose_landmarks.landmark
+            
             lshoulder = [int(landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].x*shape[1]),int(landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].y*shape[0])]
             rshoulder = [int(landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x*shape[1]),int(landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y*shape[0])]
             lhip = [int(landmarks[self.mp_pose.PoseLandmark.LEFT_HIP.value].x*shape[1]),int(landmarks[self.mp_pose.PoseLandmark.LEFT_HIP.value].y*shape[0])]
@@ -55,34 +57,25 @@ class poseDetector:
             rknee = [int(landmarks[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].x*shape[1]),int(landmarks[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].y*shape[0])]
 
             image_points = np.array([
-                tl,tr,br,bl,    
+                lshoulder,rshoulder,
+                #lhip,rhip,
+                lelbow,relbow,
+                #lwrist,rwrist,
+                #lknee,rknee
+                
                 ], dtype="double")
+            print(image_points)
             
             return image_points
         
         except:
             return None
 
-        # Recolor back to BGR
-        rgbimage.flags.writeable = True
-        rgbimage = cv2.cvtColor(rgbimage, cv2.COLOR_RGB2BGR)
         
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def draw_result(self,fr,points):
+        pts = points.reshape((-1, 1, 2)).astype(np.int32)
+        cv2.polylines(fr,[pts],True,(255,0,0),3)
+        
 
 
 
